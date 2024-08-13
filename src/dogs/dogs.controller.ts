@@ -9,9 +9,11 @@ import {
   Body,
   Put,
   Delete,
+  Inject,
 } from '@nestjs/common';
+import { DogsService } from './dogs.service';
 
-class dogsTypes {
+export interface dogsTypes {
   name: string;
   age: number;
   breed: string;
@@ -19,10 +21,14 @@ class dogsTypes {
 
 @Controller('dogs')
 export class DogsController {
-  @Post()
-  postDogs(): string {
-    return `Posted scobby dooby do`;
-  }
+  // Dependency Injection
+  // giving the program the tools it needs to complete the job automatically
+  // instead of you having to hand them over every time.
+
+  @Inject(DogsService)
+  private dogsService: DogsService;
+
+  // constructor(private dogsService: DogsService) {}
 
   @Get()
   getDogs() {
@@ -47,6 +53,11 @@ export class DogsController {
     return `idk ${id} bruh`;
   }
 
+  @Post()
+  postDogs(): string {
+    return `Posted scobby dooby do`;
+  }
+
   @Post('customHttpCode')
   @HttpCode(203)
   @Header('dog', 'scobby dooby do')
@@ -67,5 +78,16 @@ export class DogsController {
   @Delete('deleteDog/:id')
   async deleteDog(@Param('id') id: string) {
     return `dog deleted ${id}`;
+  }
+
+  // using services
+  @Post('create/createDog')
+  async create(@Body() dog: dogsTypes) {
+    this.dogsService.create(dog);
+  }
+
+  @Get('get/getDog')
+  async get() {
+    this.dogsService.get();
   }
 }
